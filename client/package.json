@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "build": "cd client && vite build",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
