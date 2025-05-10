@@ -28,7 +28,9 @@ export async function parseFeed(feedXml: string): Promise<RssFeedResponse> {
       ? Array.from(xmlDoc.getElementsByTagName('entry'))
       : Array.from(xmlDoc.getElementsByTagName('item'));
     
-    const items: RssItem[] = itemElements.map(item => {
+    console.log(`Found ${itemElements.length} items in the feed`);
+    
+    const items: RssItem[] = itemElements.map((item, index) => {
       const title = isAtom
         ? item.querySelector('title')?.textContent || ''
         : item.getElementsByTagName('title')[0]?.textContent || '';
@@ -57,9 +59,20 @@ export async function parseFeed(feedXml: string): Promise<RssFeedResponse> {
       let isoDate = pubDate;
       try {
         if (pubDate) {
-          isoDate = new Date(pubDate).toISOString();
+          const parsedDate = new Date(pubDate);
+          isoDate = parsedDate.toISOString();
+          
+          // 디버깅 로그
+          if (index === 0) {
+            console.log('First post date info:', {
+              original: pubDate,
+              parsed: parsedDate.toString(),
+              isoDate: isoDate
+            });
+          }
         }
       } catch (e) {
+        console.error('Date parsing error:', e, 'for date:', pubDate);
         // Just keep original date if parsing fails
       }
       
@@ -73,6 +86,8 @@ export async function parseFeed(feedXml: string): Promise<RssFeedResponse> {
         isoDate
       };
     });
+    
+    console.log(`Processed ${items.length} items with first item date:`, items[0]?.isoDate);
     
     return {
       title: feedTitle,
