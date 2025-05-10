@@ -39,10 +39,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new blog
   app.post("/api/blogs", async (req: Request, res: Response) => {
     try {
-      const blogData = insertBlogSchema.parse(req.body);
+      // 날짜 형식 처리를 위한 전처리 작업
+      const data = req.body;
+      
+      // lastPosted가 문자열로 왔을 때 Date 객체로 변환
+      if (data.lastPosted && typeof data.lastPosted === 'string') {
+        try {
+          // ISO 문자열을 Date 객체로 변환해서 그대로 사용
+          const date = new Date(data.lastPosted);
+          data.lastPosted = date;
+        } catch (e) {
+          console.error('Date parsing error:', e);
+          data.lastPosted = null;
+        }
+      }
+      
+      // posts 배열의 각 항목에서 date 속성이 문자열일 경우 Date 객체로 변환
+      if (data.posts && Array.isArray(data.posts)) {
+        data.posts = data.posts.map(post => {
+          if (post.date && typeof post.date === 'string') {
+            try {
+              post.date = new Date(post.date);
+            } catch (e) {
+              console.error('Post date parsing error:', e);
+            }
+          }
+          return post;
+        });
+      }
+      
+      const blogData = insertBlogSchema.parse(data);
       const blog = await storage.createBlog(blogData);
       res.status(201).json(blog);
     } catch (error) {
+      console.error('Blog creation error:', error);
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         return res.status(400).json({ message: validationError.message });
@@ -59,13 +89,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid blog ID" });
       }
 
-      const updatedBlog = await storage.updateBlog(id, req.body);
+      // 날짜 형식 처리를 위한 전처리 작업
+      const data = req.body;
+      
+      // lastPosted가 문자열로 왔을 때 Date 객체로 변환
+      if (data.lastPosted && typeof data.lastPosted === 'string') {
+        try {
+          const date = new Date(data.lastPosted);
+          data.lastPosted = date;
+        } catch (e) {
+          console.error('Date parsing error:', e);
+          data.lastPosted = null;
+        }
+      }
+      
+      // posts 배열의 각 항목에서 date 속성이 문자열일 경우 Date 객체로 변환
+      if (data.posts && Array.isArray(data.posts)) {
+        data.posts = data.posts.map(post => {
+          if (post.date && typeof post.date === 'string') {
+            try {
+              post.date = new Date(post.date);
+            } catch (e) {
+              console.error('Post date parsing error:', e);
+            }
+          }
+          return post;
+        });
+      }
+
+      const updatedBlog = await storage.updateBlog(id, data);
       if (!updatedBlog) {
         return res.status(404).json({ message: "Blog not found" });
       }
 
       res.json(updatedBlog);
     } catch (error) {
+      console.error('Blog update error:', error);
       res.status(500).json({ message: "Failed to update blog" });
     }
   });

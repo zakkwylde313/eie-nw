@@ -32,6 +32,16 @@ export const insertBlogSchema = createInsertSchema(blogs).omit({
   rssUrl: z.string().url("유효한 URL을 입력해주세요"),
   url: z.string().url("유효한 URL을 입력해주세요"),
   name: z.string().min(1, "블로그 이름은 필수입니다"),
+  // 날짜 필드에 대한 유연한 검증 추가
+  lastPosted: z.union([z.date(), z.null(), z.undefined()]).optional(),
+  posts: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      url: z.string(),
+      date: z.date()
+    })
+  ).optional().default([]),
 });
 
 export type InsertBlog = z.infer<typeof insertBlogSchema>;
