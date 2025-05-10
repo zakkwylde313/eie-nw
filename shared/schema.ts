@@ -64,3 +64,11 @@ export interface RssItem {
   guid?: string;
   isoDate?: string;
 }
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
