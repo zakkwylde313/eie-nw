@@ -29,12 +29,24 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const now = new Date();
     
+    // 날짜 관련 타입 문제를 처리하기 위한 posts 정규화
+    let normalizedPosts: Post[] = [];
+    
+    if (insertBlog.posts && Array.isArray(insertBlog.posts)) {
+      normalizedPosts = insertBlog.posts.map(post => ({
+        id: post.id || `post-${Math.random().toString(36).substring(2, 11)}`,
+        title: post.title || '',
+        url: post.url || '',
+        date: post.date instanceof Date ? post.date : new Date(post.date || now)
+      }));
+    }
+    
     const blog: Blog = { 
       ...insertBlog, 
       id,
       lastPosted: insertBlog.lastPosted || null,
       totalPosts: insertBlog.totalPosts || 0,
-      posts: insertBlog.posts || [],
+      posts: normalizedPosts,
       createdAt: now
     };
     
@@ -45,6 +57,18 @@ export class MemStorage implements IStorage {
   async updateBlog(id: number, data: Partial<Blog>): Promise<Blog | undefined> {
     const blog = this.blogs.get(id);
     if (!blog) return undefined;
+
+    // posts 배열이 있을 경우 정규화
+    if (data.posts && Array.isArray(data.posts)) {
+      const now = new Date();
+      const normalizedPosts: Post[] = data.posts.map(post => ({
+        id: post.id || `post-${Math.random().toString(36).substring(2, 11)}`,
+        title: post.title || '',
+        url: post.url || '',
+        date: post.date instanceof Date ? post.date : new Date(post.date || now)
+      }));
+      data.posts = normalizedPosts;
+    }
 
     const updatedBlog = { ...blog, ...data };
     this.blogs.set(id, updatedBlog);
