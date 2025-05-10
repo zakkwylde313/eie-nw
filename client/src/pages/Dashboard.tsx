@@ -71,7 +71,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between">
           <div className="flex items-center mb-3 sm:mb-0">
             <Newspaper className="text-primary mr-2 h-6 w-6" />
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">블로그 모임 대시보드</h1>
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">경기 서북부 협의회 블로그 첼린지</h1>
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
@@ -118,13 +118,13 @@ export default function Dashboard() {
           <InfoIcon className="text-blue-500 mt-0.5 mr-3 flex-shrink-0 h-5 w-5" />
           <div>
             <h3 className="font-medium text-blue-800 dark:text-blue-300">블로그 활동 규칙</h3>
-            <p className="text-blue-700 dark:text-blue-400 text-sm mt-1">모든 구성원은 2주에 한 번 이상 포스팅해야 합니다. 최근 2주 동안 포스팅이 없는 블로그는 비활성으로 표시됩니다.</p>
+            <p className="text-blue-700 dark:text-blue-400 text-sm mt-1">경기 서북부 협의회 구성원은 2주에 한 번 이상 포스팅해야 합니다. 최근 2주 동안 포스팅이 없는 블로그는 비활성으로 표시됩니다.</p>
           </div>
         </div>
         
         {/* Blog Dashboard */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">모든 블로그 현황</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">협의회 블로그 현황</h2>
         </div>
         
         {/* Loading State */}
@@ -181,7 +181,7 @@ export default function Dashboard() {
             className="flex items-center text-primary font-medium"
           >
             <Newspaper className="mr-2 h-5 w-5" />
-            새 블로그 추가하기
+            새 협의회 블로그 추가하기
           </Button>
         </div>
       </main>
@@ -191,7 +191,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center text-gray-500 dark:text-gray-400 text-sm">
             <div>
-              © {new Date().getFullYear()} 블로그 모임 대시보드
+              © {new Date().getFullYear()} 경기 서북부 협의회 블로그 첼린지
             </div>
             <div className="mt-2 md:mt-0">
               <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-primary transition mr-4">도움말</a>

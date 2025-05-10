@@ -89,10 +89,10 @@ export default function AddBlogModal({ open, onOpenChange }: AddBlogModalProps) 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5 text-primary" />
-            새 블로그 추가
+            협의회 블로그 추가
           </DialogTitle>
           <DialogDescription>
-            등록하려는 블로그 정보와 RSS 피드 URL을 입력하세요.
+            등록하려는 협의회 블로그 정보와 RSS 피드 URL을 입력하세요.
           </DialogDescription>
         </DialogHeader>
         
