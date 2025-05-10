@@ -103,7 +103,7 @@ export default function Dashboard() {
                 <SelectValue placeholder="정렬 방식" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="rank">챌린지 포스팅순</SelectItem>
+                <SelectItem value="rank">챌린지 순위순</SelectItem>
                 <SelectItem value="date">최신 포스팅순</SelectItem>
                 <SelectItem value="name">블로그명순</SelectItem>
               </SelectContent>
