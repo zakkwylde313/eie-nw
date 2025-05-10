@@ -21,7 +21,7 @@ export function getBlogStatus(lastPostedDate: Date | null | undefined): ApiStatu
 }
 
 // 챌린지 시작일 이후의 포스트 수 계산
-export function getPostsAfterChallengeStart(posts: { date: Date }[] | undefined): number {
+export function getPostsAfterChallengeStart(posts: { date: Date }[] | null | undefined): number {
   if (!posts || posts.length === 0) return 0;
   
   return posts.filter(post => {

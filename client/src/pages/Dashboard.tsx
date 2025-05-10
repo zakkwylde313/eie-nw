@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Blog, RssFeedResponse } from '@shared/schema';
-import { ApiStatus, getBlogStatus, formatDate, formatUrl } from '@/lib/dateUtils';
+import { ApiStatus, getBlogStatus, formatDate, formatUrl, getPostsAfterChallengeStart, CHALLENGE_START_DATE } from '@/lib/dateUtils';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import BlogCard from '@/components/BlogCard';
@@ -45,15 +45,24 @@ export default function Dashboard() {
     }
   };
 
+  // 모든 블로그에 대해 챌린지 포스팅 수 계산
+  const blogsWithChallengePosts = blogs.map(blog => {
+    const challengePosts = getPostsAfterChallengeStart(blog.posts);
+    return { ...blog, challengePosts };
+  });
+  
   // Filter and sort blogs
-  const filteredBlogs = blogs
+  const filteredBlogs = blogsWithChallengePosts
     .filter(blog => {
       if (statusFilter === 'all') return true;
       const status = getBlogStatus(blog.lastPosted);
       return statusFilter === 'active' ? status === ApiStatus.Active : status === ApiStatus.Inactive;
     })
     .sort((a, b) => {
-      if (sortOption === 'date') {
+      if (sortOption === 'rank') {
+        // 챌린지 포스팅 수 기준 내림차순 정렬
+        return (b.challengePosts || 0) - (a.challengePosts || 0);
+      } else if (sortOption === 'date') {
         return new Date(b.lastPosted || 0).getTime() - new Date(a.lastPosted || 0).getTime();
       } else {
         return a.name.localeCompare(b.name);
@@ -94,6 +103,7 @@ export default function Dashboard() {
                 <SelectValue placeholder="정렬 방식" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="rank">챌린지 포스팅순</SelectItem>
                 <SelectItem value="date">최신 포스팅순</SelectItem>
                 <SelectItem value="name">블로그명순</SelectItem>
               </SelectContent>
@@ -120,8 +130,11 @@ export default function Dashboard() {
         <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-900 rounded-lg p-4 mb-6 flex items-start">
           <InfoIcon className="text-blue-500 mt-0.5 mr-3 flex-shrink-0 h-5 w-5" />
           <div>
-            <h3 className="font-medium text-blue-800 dark:text-blue-300">블로그 활동 규칙</h3>
-            <p className="text-blue-700 dark:text-blue-400 text-sm mt-1">경기 서북부 협의회 구성원은 2주에 한 번 이상 포스팅해야 합니다. 최근 2주 동안 포스팅이 없는 블로그는 비활성으로 표시됩니다.</p>
+            <h3 className="font-medium text-blue-800 dark:text-blue-300">블로그 챌린지 규칙</h3>
+            <p className="text-blue-700 dark:text-blue-400 text-sm mt-1">
+              경기 서북부 협의회 구성원은 2주에 한 번 이상 포스팅해야 합니다. 최근 2주 동안 포스팅이 없는 블로그는 비활성으로 표시됩니다.<br />
+              <strong>챌린지 시작일 {formatDate(CHALLENGE_START_DATE)}부터</strong> 올라온 포스팅 개수에 따라 순위가 매겨집니다.
+            </p>
           </div>
         </div>
         
@@ -167,10 +180,11 @@ export default function Dashboard() {
         {/* Blogs Grid */}
         {!isLoading && !isError && filteredBlogs.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredBlogs.map(blog => (
+            {filteredBlogs.map((blog, index) => (
               <BlogCard 
                 key={blog.id} 
-                blog={blog} 
+                blog={blog}
+                rank={sortOption === 'rank' ? index : undefined}
               />
             ))}
           </div>
