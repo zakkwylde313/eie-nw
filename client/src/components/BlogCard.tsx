@@ -1,4 +1,4 @@
-import { CheckCircle2, AlertCircle, Link as LinkIcon, ExternalLink, RssIcon, Clock } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Link as LinkIcon, ExternalLink, RssIcon, Clock, Trophy } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
@@ -8,22 +8,35 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Blog } from '@shared/schema';
-import { ApiStatus, getBlogStatus, formatDate, formatUrl } from '@/lib/dateUtils';
+import { ApiStatus, getBlogStatus, formatDate, formatUrl, getPostsAfterChallengeStart } from '@/lib/dateUtils';
 
 interface BlogCardProps {
   blog: Blog;
+  rank?: number;
 }
 
-export default function BlogCard({ blog }: BlogCardProps) {
+export default function BlogCard({ blog, rank }: BlogCardProps) {
   const status = getBlogStatus(blog.lastPosted);
   const isActive = status === ApiStatus.Active;
+  const challengePosts = getPostsAfterChallengeStart(blog.posts);
   
   return (
     <Card className="overflow-hidden hover:shadow-md transition duration-300">
       {/* Blog Header */}
       <CardHeader className="p-4 pb-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-800 dark:text-gray-100 truncate">{blog.name}</h3>
+          <div className="flex items-center">
+            {rank !== undefined && (
+              <div className={`flex items-center justify-center rounded-full w-6 h-6 mr-2 text-xs font-bold 
+                ${rank === 0 ? 'bg-yellow-100 text-yellow-800' : 
+                rank === 1 ? 'bg-gray-100 text-gray-800' : 
+                rank === 2 ? 'bg-amber-100 text-amber-800' : 
+                'bg-blue-50 text-blue-800'}`}>
+                {rank + 1}
+              </div>
+            )}
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 truncate">{blog.name}</h3>
+          </div>
           {isActive ? (
             <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
@@ -59,8 +72,11 @@ export default function BlogCard({ blog }: BlogCardProps) {
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">총 포스팅</div>
-          <div className="text-sm font-medium">{blog.totalPosts || 0}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">챌린지 포스팅</div>
+          <div className="flex items-center justify-end gap-1 text-sm font-medium">
+            <Trophy className="h-3 w-3 text-amber-500" />
+            <span>{challengePosts}</span>
+          </div>
         </div>
       </div>
       

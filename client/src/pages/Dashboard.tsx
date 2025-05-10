@@ -16,7 +16,7 @@ import { parseFeed } from '@/lib/rssUtils';
 export default function Dashboard() {
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [sortOption, setSortOption] = useState<string>('date');
+  const [sortOption, setSortOption] = useState<string>('rank');
   const [isAddBlogModalOpen, setIsAddBlogModalOpen] = useState(false);
 
   const {
@@ -71,7 +71,10 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between">
           <div className="flex items-center mb-3 sm:mb-0">
             <Newspaper className="text-primary mr-2 h-6 w-6" />
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">경기 서북부 협의회 블로그 첼린지</h1>
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+              <span className="block">경기 서북부 협의회</span>
+              <span className="block">블로그 챌린지</span>
+            </h1>
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
