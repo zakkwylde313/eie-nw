@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { insertBlogSchema } from '@shared/schema';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { fetchFeed, rssToPosts } from '@/lib/rssUtils';
 
 interface AddBlogModalProps {
   open: boolean;
@@ -43,8 +44,28 @@ export default function AddBlogModal({ open, onOpenChange }: AddBlogModalProps) 
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: InsertBlog) => {
-      const res = await apiRequest('POST', '/api/blogs', data);
-      return res.json();
+      try {
+        // 직접 RSS 피드를 가져와서 처리하는 로직 추가
+        const feed = await fetchFeed(data.rssUrl);
+        const posts = rssToPosts(feed.items);
+        
+        // 최신 포스트 날짜 설정
+        const lastPost = posts.length > 0 ? posts[0].date : null;
+        
+        const blogWithFeedData: InsertBlog = {
+          ...data,
+          lastPosted: lastPost,
+          totalPosts: posts.length,
+          posts: posts.slice(0, 5) // 최근 5개 포스트만 저장
+        };
+        
+        console.log('Sending blog data with posts:', blogWithFeedData);
+        const res = await apiRequest('POST', '/api/blogs', blogWithFeedData);
+        return res.json();
+      } catch (error) {
+        console.error('Error adding blog:', error);
+        throw new Error('블로그 추가 중 오류가 발생했습니다. RSS 피드를 확인해주세요.');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/blogs'] });
